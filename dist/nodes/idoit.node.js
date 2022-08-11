@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.idoit = void 0;
+const GenericFunctions_1 = require("./GenericFunctions");
 class idoit {
     constructor() {
         this.description = {
@@ -14,6 +15,7 @@ class idoit {
                 name: 'idoit',
                 color: '#772244',
             },
+            subtitle: '={{$parameter["namespace"] + ": " + $parameter["operation"]}}',
             inputs: ['main'],
             outputs: ['main'],
             credentials: [
@@ -128,71 +130,106 @@ class idoit {
                     default: '',
                     description: 'Id of Resource',
                 },
+                {
+                    displayName: 'Retrieve and Split Data Items',
+                    name: 'split',
+                    type: 'boolean',
+                    displayOptions: {
+                        show: {
+                            operation: [
+                                'read',
+                            ],
+                            namespace: [
+                                'cmdb.category',
+                            ],
+                        },
+                    },
+                    default: true,
+                    description: 'Retrieve and Split Data array into seperate Items',
+                },
             ],
         };
     }
     async execute() {
-        let responseData;
-        const namespace = this.getNodeParameter('namespace', 0);
-        const operation = this.getNodeParameter('operation', 0);
+        const items = this.getInputData();
+        const returnItems = [];
+        let item;
+        const namespace = this.getNodeParameter('namespace', 0, '');
+        const operation = this.getNodeParameter('operation', 0, '');
         const credentials = await this.getCredentials('idoit');
-        if (operation == 'delete') {
-        }
-        if (operation == 'update') {
-        }
-        if (operation == 'read') {
-            if (namespace === 'cmdb.object') {
-                const id = this.getNodeParameter('id', 0);
-                const data = [{
-                        'jsonrpc': '2.0',
-                        'method': `${namespace}.read`,
-                        'params': {
-                            'id': id,
-                            'apikey': `${credentials.apikey}`
-                        },
-                        'id': 1
-                    }];
-                const options = {
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                    method: 'POST',
-                    body: data,
-                    uri: `${credentials.host}`,
-                    json: true,
-                    rejectUnauthorized: false,
-                };
-                responseData = await this.helpers.request(options);
+        for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
+            try {
+                if (operation == 'delete') {
+                }
+                if (operation == 'update') {
+                }
+                if (operation == 'read') {
+                    if (namespace === 'cmdb.object') {
+                        const id = this.getNodeParameter('id', itemIndex, '');
+                        item = items[itemIndex];
+                        const rbody = {
+                            'jsonrpc': '2.0',
+                            'method': `${namespace}.read`,
+                            'params': {
+                                'id': id,
+                                'apikey': `${credentials.apikey}`
+                            },
+                            'id': 1
+                        };
+                        const newItem = {
+                            json: {},
+                            binary: {},
+                        };
+                        newItem.json = JSON.parse(await GenericFunctions_1.idoitRequest.call(this, rbody));
+                        returnItems.push(newItem);
+                    }
+                    if (namespace === 'cmdb.category') {
+                        const id = this.getNodeParameter('id', itemIndex, '');
+                        const category = this.getNodeParameter('category', itemIndex, '');
+                        const split = this.getNodeParameter('split', itemIndex, '');
+                        const rbody = {
+                            'jsonrpc': '2.0',
+                            'method': `${namespace}.read`,
+                            'params': {
+                                'objID': id,
+                                'category': `${category}`,
+                                'apikey': `${credentials.apikey}`
+                            },
+                            'id': 1
+                        };
+                        if (split) {
+                            const data = JSON.parse(await GenericFunctions_1.idoitRequest.call(this, rbody)).result;
+                            for (let dataIndex = 0; dataIndex < data.length; dataIndex++) {
+                                const newItem = {
+                                    json: {},
+                                    binary: {},
+                                };
+                                newItem.json = data[dataIndex];
+                                returnItems.push(newItem);
+                            }
+                        }
+                        else {
+                            const newItem = {
+                                json: {},
+                                binary: {},
+                            };
+                            newItem.json = JSON.parse(await GenericFunctions_1.idoitRequest.call(this, rbody));
+                            returnItems.push(newItem);
+                        }
+                    }
+                }
+                if (operation == 'create') {
+                }
             }
-            if (namespace === 'cmdb.category') {
-                const id = this.getNodeParameter('id', 0);
-                const category = this.getNodeParameter('category', 0);
-                const data = [{
-                        'jsonrpc': '2.0',
-                        'method': `${namespace}.read`,
-                        'params': {
-                            'objID': id,
-                            'category': `${category}`,
-                            'apikey': `${credentials.apikey}`
-                        },
-                        'id': 1
-                    }];
-                const options = {
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                    method: 'POST',
-                    body: data,
-                    uri: `${credentials.host}`,
-                    json: true,
-                    rejectUnauthorized: false,
-                };
-                responseData = await this.helpers.request(options);
+            catch (error) {
+                if (this.continueOnFail()) {
+                    returnItems.push({ json: { error: error.message } });
+                    continue;
+                }
+                throw error;
             }
         }
-        if (operation == 'create') {
-        }
-        return [this.helpers.returnJsonArray(responseData)];
+        return this.prepareOutputData(returnItems);
     }
 }
 exports.idoit = idoit;
