@@ -179,6 +179,8 @@ export class idoit implements INodeType {
 					body: data,
 					uri: `${credentials.host}`,
 					json: true,
+					//@ts-ignore
+					rejectUnauthorized: false,						
 				};
 				responseData = await this.helpers.request(options);
 			}
@@ -205,6 +207,8 @@ export class idoit implements INodeType {
 					body: data,
 					uri: `${credentials.host}`,
 					json: true,
+					//@ts-ignore
+					rejectUnauthorized: false,					
 				};
 				responseData = await this.helpers.request(options);				
 			}

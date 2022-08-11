@@ -160,6 +160,7 @@ class idoit {
                     body: data,
                     uri: `${credentials.host}`,
                     json: true,
+                    rejectUnauthorized: false,
                 };
                 responseData = await this.helpers.request(options);
             }
@@ -184,6 +185,7 @@ class idoit {
                     body: data,
                     uri: `${credentials.host}`,
                     json: true,
+                    rejectUnauthorized: false,
                 };
                 responseData = await this.helpers.request(options);
             }
