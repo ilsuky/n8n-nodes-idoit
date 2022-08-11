@@ -147,7 +147,7 @@ class idoit {
                         'jsonrpc': '2.0',
                         'method': `${namespace}.read`,
                         'params': {
-                            'id': `${id}`,
+                            'id': id,
                             'apikey': `${credentials.apikey}`
                         },
                         'id': 1
@@ -171,7 +171,7 @@ class idoit {
                         'jsonrpc': '2.0',
                         'method': `${namespace}.read`,
                         'params': {
-                            'id': `${id}`,
+                            'objID': id,
                             'category': `${category}`,
                             'apikey': `${credentials.apikey}`
                         },
