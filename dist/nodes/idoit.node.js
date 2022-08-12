@@ -6,7 +6,7 @@ class idoit {
     constructor() {
         this.description = {
             displayName: 'i-doit',
-            name: 'idoit',
+            name: 'i-doit',
             icon: 'file:idoit.png',
             group: ['transform'],
             version: 1,
@@ -15,7 +15,7 @@ class idoit {
                 name: 'idoit',
                 color: '#772244',
             },
-            subtitle: '={{$parameter["namespace"] + ": " + $parameter["operation"]}}',
+            subtitle: '={{$parameter["namespace"]}}',
             inputs: ['main'],
             outputs: ['main'],
             credentials: [
@@ -135,6 +135,20 @@ class idoit {
                     description: 'Id of Resource',
                 },
                 {
+                    displayName: 'Search String',
+                    name: 'searchstring',
+                    type: 'string',
+                    displayOptions: {
+                        show: {
+                            namespace: [
+                                'idoit.search',
+                            ],
+                        },
+                    },
+                    default: '',
+                    description: 'Id of Resource',
+                },
+                {
                     displayName: 'Retrieve and Split Data Items',
                     name: 'split',
                     type: 'boolean',
@@ -145,6 +159,20 @@ class idoit {
                             ],
                             namespace: [
                                 'cmdb.category',
+                            ],
+                        },
+                    },
+                    default: true,
+                    description: 'Retrieve and Split Data array into seperate Items',
+                },
+                {
+                    displayName: 'Retrieve and Split Data Items',
+                    name: 'split',
+                    type: 'boolean',
+                    displayOptions: {
+                        show: {
+                            namespace: [
+                                'idoit.search',
                             ],
                         },
                     },
@@ -225,7 +253,7 @@ class idoit {
                 }
                 if (operation == 'create') {
                 }
-                if (namespace == 'idoit.version') {
+                if (namespace == 'idoit.version' || namespace == 'idoit.constants') {
                     const rbody = {
                         'jsonrpc': '2.0',
                         'method': `${namespace}`,
@@ -240,6 +268,40 @@ class idoit {
                     };
                     newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
                     returnItems.push(newItem);
+                }
+                if (namespace == 'idoit.search') {
+                    const searchstring = this.getNodeParameter('searchstring', itemIndex, '');
+                    const split = this.getNodeParameter('split', itemIndex, '');
+                    const rbody = {
+                        'jsonrpc': '2.0',
+                        'method': `${namespace}`,
+                        'params': {
+                            'q': `${searchstring}`,
+                            'apikey': `${credentials.apikey}`
+                        },
+                        'id': 1
+                    };
+                    const data = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                    if (split) {
+                        const datajson = data.result;
+                        for (let dataIndex = 0; dataIndex < datajson.length; dataIndex++) {
+                            const newItem = {
+                                json: {},
+                                binary: {},
+                            };
+                            newItem.json = datajson[dataIndex];
+                            returnItems.push(newItem);
+                        }
+                    }
+                    else {
+                        const newItem = {
+                            json: {},
+                            binary: {},
+                        };
+                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        returnItems.push(newItem);
+                    }
+                    ;
                 }
             }
             catch (error) {

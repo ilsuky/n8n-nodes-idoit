@@ -5,7 +5,7 @@ import { idoitRequest } from './GenericFunctions';
 export class idoit implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'i-doit',
-		name: 'idoit',
+		name: 'i-doit',
 		icon: 'file:idoit.png',
 		group: ['transform'],
 		version: 1,
@@ -14,7 +14,7 @@ export class idoit implements INodeType {
 			name: 'idoit',
 			color: '#772244',
 		},
-		subtitle: '={{$parameter["namespace"] + ": " + $parameter["operation"]}}',
+		subtitle: '={{$parameter["namespace"]}}',
 		inputs: ['main'],
 		outputs: ['main'],
 		credentials: [
@@ -134,6 +134,20 @@ export class idoit implements INodeType {
 				description: 'Id of Resource',
 			},
 			{
+				displayName: 'Search String',
+				name: 'searchstring',
+				type: 'string',
+				displayOptions: {
+					show: {
+						namespace:[
+							'idoit.search',
+						],						
+					},
+				},
+				default: '',
+				description: 'Id of Resource',
+			},			
+			{
 				displayName: 'Retrieve and Split Data Items',
 				name: 'split',
 				type: 'boolean',
@@ -149,7 +163,21 @@ export class idoit implements INodeType {
 				},
 				default: true,
 				description: 'Retrieve and Split Data array into seperate Items',
-			},			
+			},		
+			{
+				displayName: 'Retrieve and Split Data Items',
+				name: 'split',
+				type: 'boolean',
+				displayOptions: {
+					show: {
+						namespace:[
+							'idoit.search',
+						],						
+					},
+				},
+				default: true,
+				description: 'Retrieve and Split Data array into seperate Items',
+			},				
 		],
 	};
 
@@ -261,7 +289,7 @@ export class idoit implements INodeType {
 				//--------------------------------------------------------
 				// 						Show Version
 				//--------------------------------------------------------
-				if(namespace == 'idoit.version'){
+				if(namespace == 'idoit.version' || namespace == 'idoit.constants'){
 					
 					const rbody =
 					{
@@ -280,7 +308,51 @@ export class idoit implements INodeType {
 					newItem.json = await idoitRequest.call(this, rbody);
 
 					returnItems.push(newItem);						
-				}				
+				}
+
+				//--------------------------------------------------------
+				// 						Search Global
+				//--------------------------------------------------------
+				if(namespace == 'idoit.search'){
+					
+					const searchstring = this.getNodeParameter('searchstring', itemIndex, '') as string;
+					const split = this.getNodeParameter('split', itemIndex, '') as boolean;
+					
+					const rbody =
+					{
+						'jsonrpc': '2.0',
+						'method': `${namespace}`,
+						'params': {
+							'q': `${searchstring}`,
+							'apikey': `${credentials.apikey}`
+						},
+						'id': 1
+					}
+					
+					const data = await idoitRequest.call(this, rbody);
+					
+					if(split){
+						const datajson = data.result;
+						for (let dataIndex = 0; dataIndex < datajson.length; dataIndex++) {
+							const newItem: INodeExecutionData = {
+								json: {},
+								binary: {},
+							};
+							newItem.json = datajson[dataIndex];
+	
+							returnItems.push(newItem);
+						}
+					} else {
+						const newItem: INodeExecutionData = {
+							json: {},
+							binary: {},
+						};
+						newItem.json = await idoitRequest.call(this, rbody);
+	
+						returnItems.push(newItem);
+					};						
+				}
+				
 
 			} catch (error:any) {
 				if (this.continueOnFail()) {
