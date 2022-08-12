@@ -215,9 +215,14 @@ export class idoit implements INodeType {
 						'id': 1
 					}
 				const data = await idoitRequest.call(this, rbody);
-				const streams = data.result.categories.g;
+				const globals = data.result.categories.g;
 				
-				for (const [key, value] of Object.entries(streams)) {
+				returnData.push({
+					//@ts-ignore
+					name: '--- Global Categories ---',
+					value: '',
+				});
+				for (const [key, value] of Object.entries(globals)) {
 					const keyName = key;
 					const keyValue = value;
 					returnData.push({
@@ -226,6 +231,41 @@ export class idoit implements INodeType {
 						value: keyName,
 					});
 				}
+
+				const specific = data.result.categories.s;
+				
+				returnData.push({
+					//@ts-ignore
+					name: '--- Specific Categories ---',
+					value: '',
+				});
+				for (const [key, value] of Object.entries(specific)) {
+					const keyName = key;
+					const keyValue = value;
+					returnData.push({
+						//@ts-ignore
+						name: keyValue,
+						value: keyName,
+					});
+				}				
+				
+				const custom = data.result.categories.g_custom;
+				
+				returnData.push({
+					//@ts-ignore
+					name: '--- Custom Categories ---',
+					value: '',
+				});
+				for (const [key, value] of Object.entries(custom)) {
+					const keyName = key;
+					const keyValue = value;
+					returnData.push({
+						//@ts-ignore
+						name: keyValue,
+						value: keyName,
+					});
+				}						
+				
 				return returnData;
 			},
 		},

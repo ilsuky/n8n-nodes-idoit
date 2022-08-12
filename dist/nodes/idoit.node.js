@@ -198,8 +198,38 @@ class idoit {
                         'id': 1
                     };
                     const data = await GenericFunctions_1.idoitRequest.call(this, rbody);
-                    const streams = data.result.categories.g;
-                    for (const [key, value] of Object.entries(streams)) {
+                    const globals = data.result.categories.g;
+                    returnData.push({
+                        name: '--- Global Categories ---',
+                        value: '',
+                    });
+                    for (const [key, value] of Object.entries(globals)) {
+                        const keyName = key;
+                        const keyValue = value;
+                        returnData.push({
+                            name: keyValue,
+                            value: keyName,
+                        });
+                    }
+                    const specific = data.result.categories.s;
+                    returnData.push({
+                        name: '--- Specific Categories ---',
+                        value: '',
+                    });
+                    for (const [key, value] of Object.entries(specific)) {
+                        const keyName = key;
+                        const keyValue = value;
+                        returnData.push({
+                            name: keyValue,
+                            value: keyName,
+                        });
+                    }
+                    const custom = data.result.categories.g_custom;
+                    returnData.push({
+                        name: '--- Custom Categories ---',
+                        value: '',
+                    });
+                    for (const [key, value] of Object.entries(custom)) {
                         const keyName = key;
                         const keyValue = value;
                         returnData.push({
