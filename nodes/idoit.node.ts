@@ -1,5 +1,5 @@
 import { IExecuteFunctions } from 'n8n-core';
-import { IDataObject, INodeExecutionData, INodeParameters, INodeType, INodeTypeDescription, NodeOperationError } from 'n8n-workflow';
+import { IDataObject, ILoadOptionsFunctions, INodeExecutionData, INodeParameters, INodeProperties, INodeType, INodeTypeDescription, NodeOperationError, INodePropertyOptions } from 'n8n-workflow';
 import { idoitRequest } from './GenericFunctions';
 
 export class idoit implements INodeType {
@@ -103,7 +103,10 @@ export class idoit implements INodeType {
 			{
 				displayName: 'Category',
 				name: 'category',
-				type: 'string',
+				type: 'options',
+				typeOptions: {
+					loadOptionsMethod: 'getCategories',
+				},
 				displayOptions: {
 					show: {
 						namespace:[
@@ -112,8 +115,22 @@ export class idoit implements INodeType {
 					},
 				},
 				default: '',
-				description: 'Category',				
-			},			
+				description: 'Category',							
+			},
+//			{
+//				displayName: 'Category',
+//				name: 'category',
+//				type: 'string',
+//				displayOptions: {
+//					show: {
+//						namespace:[
+//							'cmdb.category',
+//						],
+//					},
+//				},
+//				default: '',
+//				description: 'Category',				
+//			},			
 			{
 				displayName: 'Id',
 				name: 'id',
@@ -180,6 +197,40 @@ export class idoit implements INodeType {
 			},				
 		],
 	};
+
+	methods = {
+		loadOptions: {
+			// Get all the available streams to display them to user so that he can
+			// select them easily
+			async getCategories(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [];
+				const credentials = await this.getCredentials('idoit') as IDataObject;
+				const rbody =
+					{
+						'jsonrpc': '2.0',
+						'method': 'idoit.constants',
+						'params': {
+							'apikey': `${credentials.apikey}`
+						},
+						'id': 1
+					}
+				const { data } = await idoitRequest.call(this, rbody);
+				const streams = data.result.categories.g;
+				
+				for (const [key, value] of Object.entries(streams)) {
+					const keyName = key;
+					const keyValue = value;
+					returnData.push({
+						//@ts-ignore
+						name: keyValue,
+						value: keyName,
+					});
+				}
+				return returnData;
+			},
+		},
+	};
+
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
@@ -283,7 +334,72 @@ export class idoit implements INodeType {
 				// 						Create
 				//--------------------------------------------------------
 				if(operation == 'create'){
+					if (namespace === 'cmdb.object') {
 
+						item = items[itemIndex];
+					
+						const rbody =
+						{
+							'jsonrpc': '2.0',
+							'method': `${namespace}.create`,
+							'params': {
+								'type': 'C__OBJTYPE__SERVER',
+								'title': 'My little server',
+								'apikey': `${credentials.apikey}`
+							},
+							'id': 1
+						}
+						
+						const newItem: INodeExecutionData = {
+							json: {},
+							binary: {},
+						};
+						newItem.json = await idoitRequest.call(this, rbody);
+						returnItems.push(newItem);						
+
+					}
+					
+					if (namespace === 'cmdb.category') {
+						const id = this.getNodeParameter('id', itemIndex, '') as string;
+						const category = this.getNodeParameter('category', itemIndex, '') as string;
+						const split = this.getNodeParameter('split', itemIndex, '') as boolean;
+						
+						const rbody =
+						{
+							'jsonrpc': '2.0',
+							'method': `${namespace}.create`,
+							'params': {
+								'objID': id,
+								'category': `${category}`,
+								'apikey': `${credentials.apikey}`
+							},
+							'id': 1
+						}
+						
+						const data = await idoitRequest.call(this, rbody);
+						
+						if(split){
+							const datajson = data.result;
+							for (let dataIndex = 0; dataIndex < datajson.length; dataIndex++) {
+								const newItem: INodeExecutionData = {
+									json: {},
+									binary: {},
+								};
+								newItem.json = datajson[dataIndex];
+		
+								returnItems.push(newItem);
+							}
+						} else {
+							const newItem: INodeExecutionData = {
+								json: {},
+								binary: {},
+							};
+							newItem.json = await idoitRequest.call(this, rbody);
+		
+							returnItems.push(newItem);
+						}						
+		
+					}
 				}
 				
 				//--------------------------------------------------------

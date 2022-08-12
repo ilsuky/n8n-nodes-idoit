@@ -104,7 +104,10 @@ class idoit {
                 {
                     displayName: 'Category',
                     name: 'category',
-                    type: 'string',
+                    type: 'options',
+                    typeOptions: {
+                        loadOptionsMethod: 'getCategories',
+                    },
                     displayOptions: {
                         show: {
                             namespace: [
@@ -181,6 +184,33 @@ class idoit {
                 },
             ],
         };
+        this.methods = {
+            loadOptions: {
+                async getCategories() {
+                    const returnData = [];
+                    const credentials = await this.getCredentials('idoit');
+                    const rbody = {
+                        'jsonrpc': '2.0',
+                        'method': 'idoit.constants',
+                        'params': {
+                            'apikey': `${credentials.apikey}`
+                        },
+                        'id': 1
+                    };
+                    const { data } = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                    const streams = data.result.categories.g;
+                    for (const [key, value] of Object.entries(streams)) {
+                        const keyName = key;
+                        const keyValue = value;
+                        returnData.push({
+                            name: keyValue,
+                            value: keyName,
+                        });
+                    }
+                    return returnData;
+                },
+            },
+        };
     }
     async execute() {
         const items = this.getInputData();
@@ -252,6 +282,60 @@ class idoit {
                     }
                 }
                 if (operation == 'create') {
+                    if (namespace === 'cmdb.object') {
+                        item = items[itemIndex];
+                        const rbody = {
+                            'jsonrpc': '2.0',
+                            'method': `${namespace}.create`,
+                            'params': {
+                                'type': 'C__OBJTYPE__SERVER',
+                                'title': 'My little server',
+                                'apikey': `${credentials.apikey}`
+                            },
+                            'id': 1
+                        };
+                        const newItem = {
+                            json: {},
+                            binary: {},
+                        };
+                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        returnItems.push(newItem);
+                    }
+                    if (namespace === 'cmdb.category') {
+                        const id = this.getNodeParameter('id', itemIndex, '');
+                        const category = this.getNodeParameter('category', itemIndex, '');
+                        const split = this.getNodeParameter('split', itemIndex, '');
+                        const rbody = {
+                            'jsonrpc': '2.0',
+                            'method': `${namespace}.create`,
+                            'params': {
+                                'objID': id,
+                                'category': `${category}`,
+                                'apikey': `${credentials.apikey}`
+                            },
+                            'id': 1
+                        };
+                        const data = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        if (split) {
+                            const datajson = data.result;
+                            for (let dataIndex = 0; dataIndex < datajson.length; dataIndex++) {
+                                const newItem = {
+                                    json: {},
+                                    binary: {},
+                                };
+                                newItem.json = datajson[dataIndex];
+                                returnItems.push(newItem);
+                            }
+                        }
+                        else {
+                            const newItem = {
+                                json: {},
+                                binary: {},
+                            };
+                            newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                            returnItems.push(newItem);
+                        }
+                    }
                 }
                 if (namespace == 'idoit.version' || namespace == 'idoit.constants') {
                     const rbody = {
