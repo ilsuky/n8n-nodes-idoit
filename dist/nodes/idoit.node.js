@@ -180,7 +180,7 @@ class idoit {
                             json: {},
                             binary: {},
                         };
-                        newItem.json = JSON.parse(await GenericFunctions_1.idoitRequest.call(this, rbody));
+                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
                         returnItems.push(newItem);
                     }
                     if (namespace === 'cmdb.category') {
@@ -197,14 +197,15 @@ class idoit {
                             },
                             'id': 1
                         };
+                        const data = await GenericFunctions_1.idoitRequest.call(this, rbody);
                         if (split) {
-                            const data = JSON.parse(await GenericFunctions_1.idoitRequest.call(this, rbody)).result;
-                            for (let dataIndex = 0; dataIndex < data.length; dataIndex++) {
+                            const datajson = data.result;
+                            for (let dataIndex = 0; dataIndex < datajson.length; dataIndex++) {
                                 const newItem = {
                                     json: {},
                                     binary: {},
                                 };
-                                newItem.json = data[dataIndex];
+                                newItem.json = datajson[dataIndex];
                                 returnItems.push(newItem);
                             }
                         }
@@ -213,7 +214,7 @@ class idoit {
                                 json: {},
                                 binary: {},
                             };
-                            newItem.json = JSON.parse(await GenericFunctions_1.idoitRequest.call(this, rbody));
+                            newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
                             returnItems.push(newItem);
                         }
                     }

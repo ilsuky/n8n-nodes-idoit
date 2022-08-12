@@ -199,7 +199,7 @@ export class idoit implements INodeType {
 							json: {},
 							binary: {},
 						};
-						newItem.json = JSON.parse(await idoitRequest.call(this, rbody));
+						newItem.json = await idoitRequest.call(this, rbody);
 						returnItems.push(newItem);						
 
 					}
@@ -221,14 +221,16 @@ export class idoit implements INodeType {
 							'id': 1
 						}
 						
+						const data = await idoitRequest.call(this, rbody);
+						
 						if(split){
-							const data = JSON.parse(await idoitRequest.call(this, rbody)).result;
-							for (let dataIndex = 0; dataIndex < data.length; dataIndex++) {
+							const datajson = data.result;
+							for (let dataIndex = 0; dataIndex < datajson.length; dataIndex++) {
 								const newItem: INodeExecutionData = {
 									json: {},
 									binary: {},
 								};
-								newItem.json = data[dataIndex];
+								newItem.json = datajson[dataIndex];
 		
 								returnItems.push(newItem);
 							}
@@ -237,7 +239,7 @@ export class idoit implements INodeType {
 								json: {},
 								binary: {},
 							};
-							newItem.json = JSON.parse(await idoitRequest.call(this, rbody));
+							newItem.json = await idoitRequest.call(this, rbody);
 		
 							returnItems.push(newItem);
 						}						
