@@ -563,7 +563,7 @@ export class idoit implements INodeType {
 					const searchstring = this.getNodeParameter('searchstring', itemIndex, '') as string;
 					item = items[itemIndex];
 								
-					if(category){
+					if(category == 'no'){
 						const rbody =
 						{
 							'jsonrpc': '2.0',
@@ -573,7 +573,6 @@ export class idoit implements INodeType {
 									'type': `${type}`,
 									'title': `${searchstring}`
 								},
-								'categories': ['`${category}`'],
 								'order_by': 'title',
 								'sort': 'ASC',
 								'apikey': `${credentials.apikey}`
@@ -588,7 +587,7 @@ export class idoit implements INodeType {
 							binary: {},
 						};
 						newItem.json = await idoitRequest.call(this, rbody);
-						returnItems.push(newItem);									
+						returnItems.push(newItem);	
 					} else {
 						const rbody =
 						{
@@ -599,6 +598,7 @@ export class idoit implements INodeType {
 									'type': `${type}`,
 									'title': `${searchstring}`
 								},
+								'categories': ['`${category}`'],
 								'order_by': 'title',
 								'sort': 'ASC',
 								'apikey': `${credentials.apikey}`

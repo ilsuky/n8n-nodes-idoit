@@ -474,7 +474,7 @@ class idoit {
                     const category = this.getNodeParameter('category', itemIndex, '');
                     const searchstring = this.getNodeParameter('searchstring', itemIndex, '');
                     item = items[itemIndex];
-                    if (category) {
+                    if (category == 'no') {
                         const rbody = {
                             'jsonrpc': '2.0',
                             'method': `${namespace}.read`,
@@ -483,7 +483,6 @@ class idoit {
                                     'type': `${type}`,
                                     'title': `${searchstring}`
                                 },
-                                'categories': ['`${category}`'],
                                 'order_by': 'title',
                                 'sort': 'ASC',
                                 'apikey': `${credentials.apikey}`
@@ -507,6 +506,7 @@ class idoit {
                                     'type': `${type}`,
                                     'title': `${searchstring}`
                                 },
+                                'categories': ['`${category}`'],
                                 'order_by': 'title',
                                 'sort': 'ASC',
                                 'apikey': `${credentials.apikey}`
