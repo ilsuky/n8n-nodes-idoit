@@ -308,59 +308,6 @@ class idoit {
                 if (operation == 'update') {
                 }
                 if (operation == 'read') {
-                    if (namespace === 'cmdb.objects') {
-                        const type = this.getNodeParameter('type', itemIndex, '');
-                        const category = this.getNodeParameter('category', itemIndex, '');
-                        const searchstring = this.getNodeParameter('searchstring', itemIndex, '');
-                        item = items[itemIndex];
-                        if (category) {
-                            const rbody = {
-                                'jsonrpc': '2.0',
-                                'method': `${namespace}.read`,
-                                'params': {
-                                    'filter': {
-                                        'type': `${type}`,
-                                        'title': `${searchstring}`
-                                    },
-                                    'categories': ['`${category}`'],
-                                    'order_by': 'title',
-                                    'sort': 'ASC',
-                                    'apikey': `${credentials.apikey}`
-                                },
-                                'id': 1
-                            };
-                            console.log(rbody);
-                            const newItem = {
-                                json: {},
-                                binary: {},
-                            };
-                            newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
-                            returnItems.push(newItem);
-                        }
-                        else {
-                            const rbody = {
-                                'jsonrpc': '2.0',
-                                'method': `${namespace}.read`,
-                                'params': {
-                                    'filter': {
-                                        'type': `${type}`,
-                                        'title': `${searchstring}`
-                                    },
-                                    'order_by': 'title',
-                                    'sort': 'ASC',
-                                    'apikey': `${credentials.apikey}`
-                                },
-                                'id': 1
-                            };
-                            console.log(rbody);
-                            const newItem = {
-                                json: {},
-                                binary: {},
-                            };
-                            newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
-                            returnItems.push(newItem);
-                        }
-                    }
                     if (namespace === 'cmdb.object') {
                         const id = this.getNodeParameter('id', itemIndex, '');
                         item = items[itemIndex];
@@ -521,6 +468,59 @@ class idoit {
                         returnItems.push(newItem);
                     }
                     ;
+                }
+                if (namespace === 'cmdb.objects') {
+                    const type = this.getNodeParameter('type', itemIndex, '');
+                    const category = this.getNodeParameter('category', itemIndex, '');
+                    const searchstring = this.getNodeParameter('searchstring', itemIndex, '');
+                    item = items[itemIndex];
+                    if (category) {
+                        const rbody = {
+                            'jsonrpc': '2.0',
+                            'method': `${namespace}.read`,
+                            'params': {
+                                'filter': {
+                                    'type': `${type}`,
+                                    'title': `${searchstring}`
+                                },
+                                'categories': ['`${category}`'],
+                                'order_by': 'title',
+                                'sort': 'ASC',
+                                'apikey': `${credentials.apikey}`
+                            },
+                            'id': 1
+                        };
+                        console.log(rbody);
+                        const newItem = {
+                            json: {},
+                            binary: {},
+                        };
+                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        returnItems.push(newItem);
+                    }
+                    else {
+                        const rbody = {
+                            'jsonrpc': '2.0',
+                            'method': `${namespace}.read`,
+                            'params': {
+                                'filter': {
+                                    'type': `${type}`,
+                                    'title': `${searchstring}`
+                                },
+                                'order_by': 'title',
+                                'sort': 'ASC',
+                                'apikey': `${credentials.apikey}`
+                            },
+                            'id': 1
+                        };
+                        console.log(rbody);
+                        const newItem = {
+                            json: {},
+                            binary: {},
+                        };
+                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        returnItems.push(newItem);
+                    }
                 }
             }
             catch (error) {
