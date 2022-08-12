@@ -124,6 +124,10 @@ export class idoit implements INodeType {
 							'read',
 							'update',
 						],
+						namespace:[
+							'cmdb.object',
+							'cmdb.category',
+						],						
 					},
 				},
 				default: '',
@@ -253,6 +257,30 @@ export class idoit implements INodeType {
 				if(operation == 'create'){
 
 				}
+				
+				//--------------------------------------------------------
+				// 						Show Version
+				//--------------------------------------------------------
+				if(namespace == 'idoit.version'){
+					
+					const rbody =
+					{
+						'jsonrpc': '2.0',
+						'method': `${namespace}`,
+						'params': {
+							'apikey': `${credentials.apikey}`
+						},
+						'id': 1
+					}
+					
+					const newItem: INodeExecutionData = {
+						json: {},
+						binary: {},
+					};
+					newItem.json = await idoitRequest.call(this, rbody);
+
+					returnItems.push(newItem);						
+				}				
 
 			} catch (error:any) {
 				if (this.continueOnFail()) {

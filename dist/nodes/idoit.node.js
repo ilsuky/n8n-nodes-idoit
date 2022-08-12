@@ -125,6 +125,10 @@ class idoit {
                                 'read',
                                 'update',
                             ],
+                            namespace: [
+                                'cmdb.object',
+                                'cmdb.category',
+                            ],
                         },
                     },
                     default: '',
@@ -220,6 +224,22 @@ class idoit {
                     }
                 }
                 if (operation == 'create') {
+                }
+                if (namespace == 'idoit.version') {
+                    const rbody = {
+                        'jsonrpc': '2.0',
+                        'method': `${namespace}`,
+                        'params': {
+                            'apikey': `${credentials.apikey}`
+                        },
+                        'id': 1
+                    };
+                    const newItem = {
+                        json: {},
+                        binary: {},
+                    };
+                    newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                    returnItems.push(newItem);
                 }
             }
             catch (error) {
