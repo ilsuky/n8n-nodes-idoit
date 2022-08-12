@@ -329,6 +329,7 @@ class idoit {
                                 },
                                 'id': 1
                             };
+                            console.log(rbody);
                             const newItem = {
                                 json: {},
                                 binary: {},
@@ -351,6 +352,7 @@ class idoit {
                                 },
                                 'id': 1
                             };
+                            console.log(rbody);
                             const newItem = {
                                 json: {},
                                 binary: {},

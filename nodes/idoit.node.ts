@@ -370,6 +370,7 @@ export class idoit implements INodeType {
 								},
 								'id': 1
 							}
+							console.log(rbody);
 							const newItem: INodeExecutionData = {
 								json: {},
 								binary: {},
@@ -392,6 +393,7 @@ export class idoit implements INodeType {
 								},
 								'id': 1
 							}
+							console.log(rbody);
 							const newItem: INodeExecutionData = {
 								json: {},
 								binary: {},
