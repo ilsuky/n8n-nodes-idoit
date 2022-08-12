@@ -120,7 +120,7 @@ class idoit {
                             ],
                         },
                     },
-                    default: '',
+                    default: 'no',
                     description: 'Category',
                 },
                 {
@@ -237,6 +237,10 @@ class idoit {
                 async getCategories() {
                     const returnData = [];
                     const credentials = await this.getCredentials('idoit');
+                    returnData.push({
+                        name: 'no Category',
+                        value: 'no',
+                    });
                     const rbody = {
                         'jsonrpc': '2.0',
                         'method': 'idoit.constants',
@@ -309,27 +313,51 @@ class idoit {
                         const category = this.getNodeParameter('category', itemIndex, '');
                         const searchstring = this.getNodeParameter('searchstring', itemIndex, '');
                         item = items[itemIndex];
-                        const rbody = {
-                            'jsonrpc': '2.0',
-                            'method': `${namespace}.read`,
-                            'params': {
-                                'filter': {
-                                    'type': `${type}`,
-                                    'title': `${searchstring}`
+                        if (category) {
+                            const rbody = {
+                                'jsonrpc': '2.0',
+                                'method': `${namespace}.read`,
+                                'params': {
+                                    'filter': {
+                                        'type': `${type}`,
+                                        'title': `${searchstring}`
+                                    },
+                                    'categories': ['`${category}`'],
+                                    'order_by': 'title',
+                                    'sort': 'ASC',
+                                    'apikey': `${credentials.apikey}`
                                 },
-                                'categories': `${category}`,
-                                'order_by': 'title',
-                                'sort': 'ASC',
-                                'apikey': `${credentials.apikey}`
-                            },
-                            'id': 1
-                        };
-                        const newItem = {
-                            json: {},
-                            binary: {},
-                        };
-                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
-                        returnItems.push(newItem);
+                                'id': 1
+                            };
+                            const newItem = {
+                                json: {},
+                                binary: {},
+                            };
+                            newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                            returnItems.push(newItem);
+                        }
+                        else {
+                            const rbody = {
+                                'jsonrpc': '2.0',
+                                'method': `${namespace}.read`,
+                                'params': {
+                                    'filter': {
+                                        'type': `${type}`,
+                                        'title': `${searchstring}`
+                                    },
+                                    'order_by': 'title',
+                                    'sort': 'ASC',
+                                    'apikey': `${credentials.apikey}`
+                                },
+                                'id': 1
+                            };
+                            const newItem = {
+                                json: {},
+                                binary: {},
+                            };
+                            newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                            returnItems.push(newItem);
+                        }
                     }
                     if (namespace === 'cmdb.object') {
                         const id = this.getNodeParameter('id', itemIndex, '');

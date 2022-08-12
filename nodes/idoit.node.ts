@@ -119,7 +119,7 @@ export class idoit implements INodeType {
 						],
 					},
 				},
-				default: '',
+				default: 'no',
 				description: 'Category',							
 			},
 			{
@@ -241,6 +241,13 @@ export class idoit implements INodeType {
 			async getCategories(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
 				const credentials = await this.getCredentials('idoit') as IDataObject;
+				
+				returnData.push({
+					//@ts-ignore
+					name: 'no Category',
+					value: 'no',
+				});
+				
 				const rbody =
 					{
 						'jsonrpc': '2.0',
@@ -345,30 +352,53 @@ export class idoit implements INodeType {
 						const category = this.getNodeParameter('category', itemIndex, '') as string;
 						const searchstring = this.getNodeParameter('searchstring', itemIndex, '') as string;
 						item = items[itemIndex];
-					
-						const rbody =
-						{
-							'jsonrpc': '2.0',
-							'method': `${namespace}.read`,
-							'params': {
-								'filter': {
-									'type': `${type}`,
-									'title': `${searchstring}`
-								},
-								'categories': `${category}`,
-								'order_by': 'title',
-								'sort': 'ASC',
-								'apikey': `${credentials.apikey}`
-							},
-							'id': 1
-						}
 						
-						const newItem: INodeExecutionData = {
-							json: {},
-							binary: {},
-						};
-						newItem.json = await idoitRequest.call(this, rbody);
-						returnItems.push(newItem);						
+						if(category){
+							const rbody =
+							{
+								'jsonrpc': '2.0',
+								'method': `${namespace}.read`,
+								'params': {
+									'filter': {
+										'type': `${type}`,
+										'title': `${searchstring}`
+									},
+									'categories': ['`${category}`'],
+									'order_by': 'title',
+									'sort': 'ASC',
+									'apikey': `${credentials.apikey}`
+								},
+								'id': 1
+							}
+							const newItem: INodeExecutionData = {
+								json: {},
+								binary: {},
+							};
+							newItem.json = await idoitRequest.call(this, rbody);
+							returnItems.push(newItem);									
+						} else {
+							const rbody =
+							{
+								'jsonrpc': '2.0',
+								'method': `${namespace}.read`,
+								'params': {
+									'filter': {
+										'type': `${type}`,
+										'title': `${searchstring}`
+									},
+									'order_by': 'title',
+									'sort': 'ASC',
+									'apikey': `${credentials.apikey}`
+								},
+								'id': 1
+							}
+							const newItem: INodeExecutionData = {
+								json: {},
+								binary: {},
+							};
+							newItem.json = await idoitRequest.call(this, rbody);
+							returnItems.push(newItem);								
+						}		
 
 					}					
 					
