@@ -201,6 +201,7 @@ class idoit {
                         show: {
                             namespace: [
                                 'idoit.search',
+                                'cmdb.objects',
                             ],
                         },
                     },
@@ -473,6 +474,7 @@ class idoit {
                     const type = this.getNodeParameter('type', itemIndex, '');
                     const category = this.getNodeParameter('category', itemIndex, '');
                     const searchstring = this.getNodeParameter('searchstring', itemIndex, '');
+                    const split = this.getNodeParameter('split', itemIndex, '');
                     item = items[itemIndex];
                     if (category == 'no') {
                         const rbody = {
@@ -489,13 +491,27 @@ class idoit {
                             },
                             'id': 1
                         };
-                        console.log(rbody);
-                        const newItem = {
-                            json: {},
-                            binary: {},
-                        };
-                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
-                        returnItems.push(newItem);
+                        const data = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        if (split) {
+                            const datajson = data.result;
+                            for (let dataIndex = 0; dataIndex < datajson.length; dataIndex++) {
+                                const newItem = {
+                                    json: {},
+                                    binary: {},
+                                };
+                                newItem.json = datajson[dataIndex];
+                                returnItems.push(newItem);
+                            }
+                        }
+                        else {
+                            const newItem = {
+                                json: {},
+                                binary: {},
+                            };
+                            newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                            returnItems.push(newItem);
+                        }
+                        ;
                     }
                     else {
                         const rbody = {
@@ -513,13 +529,27 @@ class idoit {
                             },
                             'id': 1
                         };
-                        console.log(rbody);
-                        const newItem = {
-                            json: {},
-                            binary: {},
-                        };
-                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
-                        returnItems.push(newItem);
+                        const data = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        if (split) {
+                            const datajson = data.result;
+                            for (let dataIndex = 0; dataIndex < datajson.length; dataIndex++) {
+                                const newItem = {
+                                    json: {},
+                                    binary: {},
+                                };
+                                newItem.json = datajson[dataIndex];
+                                returnItems.push(newItem);
+                            }
+                        }
+                        else {
+                            const newItem = {
+                                json: {},
+                                binary: {},
+                            };
+                            newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                            returnItems.push(newItem);
+                        }
+                        ;
                     }
                 }
             }

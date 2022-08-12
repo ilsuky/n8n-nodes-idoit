@@ -200,6 +200,7 @@ export class idoit implements INodeType {
 					show: {
 						namespace:[
 							'idoit.search',
+							'cmdb.objects',
 						],						
 					},
 				},
@@ -561,6 +562,7 @@ export class idoit implements INodeType {
 					const type = this.getNodeParameter('type', itemIndex, '') as string;
 					const category = this.getNodeParameter('category', itemIndex, '') as string;
 					const searchstring = this.getNodeParameter('searchstring', itemIndex, '') as string;
+					const split = this.getNodeParameter('split', itemIndex, '') as boolean;
 					item = items[itemIndex];
 								
 					if(category == 'no'){
@@ -580,14 +582,28 @@ export class idoit implements INodeType {
 							'id': 1
 						}
 						
-						console.log(rbody);
+						const data = await idoitRequest.call(this, rbody);
 						
-						const newItem: INodeExecutionData = {
-							json: {},
-							binary: {},
-						};
-						newItem.json = await idoitRequest.call(this, rbody);
-						returnItems.push(newItem);	
+						if(split){
+							const datajson = data.result;
+							for (let dataIndex = 0; dataIndex < datajson.length; dataIndex++) {
+								const newItem: INodeExecutionData = {
+									json: {},
+									binary: {},
+								};
+								newItem.json = datajson[dataIndex];
+		
+								returnItems.push(newItem);
+							}
+						} else {
+							const newItem: INodeExecutionData = {
+								json: {},
+								binary: {},
+							};
+							newItem.json = await idoitRequest.call(this, rbody);
+		
+							returnItems.push(newItem);
+						};		
 					} else {
 						const rbody =
 						{
@@ -606,14 +622,29 @@ export class idoit implements INodeType {
 							'id': 1
 						}
 						
-						console.log(rbody);
+						const data = await idoitRequest.call(this, rbody);
 						
-						const newItem: INodeExecutionData = {
-							json: {},
-							binary: {},
-						};
-						newItem.json = await idoitRequest.call(this, rbody);
-						returnItems.push(newItem);								
+						if(split){
+							const datajson = data.result;
+							for (let dataIndex = 0; dataIndex < datajson.length; dataIndex++) {
+								const newItem: INodeExecutionData = {
+									json: {},
+									binary: {},
+								};
+								newItem.json = datajson[dataIndex];
+		
+								returnItems.push(newItem);
+							}
+						} else {
+							const newItem: INodeExecutionData = {
+								json: {},
+								binary: {},
+							};
+							newItem.json = await idoitRequest.call(this, rbody);
+		
+							returnItems.push(newItem);
+						};		
+							
 					}		
 				}					
 				
