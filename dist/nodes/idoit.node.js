@@ -197,7 +197,7 @@ class idoit {
                         },
                         'id': 1
                     };
-                    const { data } = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                    const data = await GenericFunctions_1.idoitRequest.call(this, rbody);
                     const streams = data.result.categories.g;
                     for (const [key, value] of Object.entries(streams)) {
                         const keyName = key;
