@@ -47,6 +47,10 @@ class idoit {
                             value: 'cmdb.object',
                         },
                         {
+                            name: 'CMDB Objects (List)',
+                            value: 'cmdb.objects',
+                        },
+                        {
                             name: 'CMDB Category',
                             value: 'cmdb.category',
                         },
@@ -112,11 +116,29 @@ class idoit {
                         show: {
                             namespace: [
                                 'cmdb.category',
+                                'cmdb.objects',
                             ],
                         },
                     },
                     default: '',
                     description: 'Category',
+                },
+                {
+                    displayName: 'Object Type',
+                    name: 'type',
+                    type: 'options',
+                    typeOptions: {
+                        loadOptionsMethod: 'getObjectTypes',
+                    },
+                    displayOptions: {
+                        show: {
+                            namespace: [
+                                'cmdb.objects',
+                            ],
+                        },
+                    },
+                    default: '',
+                    description: 'Object Type ex. Server or Switch',
                 },
                 {
                     displayName: 'Id',
@@ -135,6 +157,7 @@ class idoit {
                         },
                     },
                     default: '',
+                    required: true,
                     description: 'Id of Resource',
                 },
                 {
@@ -145,11 +168,13 @@ class idoit {
                         show: {
                             namespace: [
                                 'idoit.search',
+                                'cmdb.objects',
                             ],
                         },
                     },
                     default: '',
-                    description: 'Id of Resource',
+                    required: true,
+                    description: 'ex. Search over all or Object title',
                 },
                 {
                     displayName: 'Retrieve and Split Data Items',
@@ -186,6 +211,29 @@ class idoit {
         };
         this.methods = {
             loadOptions: {
+                async getObjectTypes() {
+                    const returnData = [];
+                    const credentials = await this.getCredentials('idoit');
+                    const rbody = {
+                        'jsonrpc': '2.0',
+                        'method': 'idoit.constants',
+                        'params': {
+                            'apikey': `${credentials.apikey}`
+                        },
+                        'id': 1
+                    };
+                    const data = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                    const objecttypes = data.result.objectTypes;
+                    for (const [key, value] of Object.entries(objecttypes)) {
+                        const keyName = key;
+                        const keyValue = value;
+                        returnData.push({
+                            name: keyValue,
+                            value: keyName,
+                        });
+                    }
+                    return returnData;
+                },
                 async getCategories() {
                     const returnData = [];
                     const credentials = await this.getCredentials('idoit');
@@ -256,6 +304,33 @@ class idoit {
                 if (operation == 'update') {
                 }
                 if (operation == 'read') {
+                    if (namespace === 'cmdb.objects') {
+                        const type = this.getNodeParameter('type', itemIndex, '');
+                        const category = this.getNodeParameter('category', itemIndex, '');
+                        const searchstring = this.getNodeParameter('searchstring', itemIndex, '');
+                        item = items[itemIndex];
+                        const rbody = {
+                            'jsonrpc': '2.0',
+                            'method': `${namespace}.read`,
+                            'params': {
+                                'filter': {
+                                    'type': `${type}`,
+                                    'title': `${searchstring}`
+                                },
+                                'categories': `${category}`,
+                                'order_by': 'title',
+                                'sort': 'ASC',
+                                'apikey': `${credentials.apikey}`
+                            },
+                            'id': 1
+                        };
+                        const newItem = {
+                            json: {},
+                            binary: {},
+                        };
+                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        returnItems.push(newItem);
+                    }
                     if (namespace === 'cmdb.object') {
                         const id = this.getNodeParameter('id', itemIndex, '');
                         item = items[itemIndex];

@@ -4,6 +4,7 @@ export declare class idoit implements INodeType {
     description: INodeTypeDescription;
     methods: {
         loadOptions: {
+            getObjectTypes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]>;
             getCategories(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]>;
         };
     };

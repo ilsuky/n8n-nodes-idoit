@@ -46,6 +46,10 @@ export class idoit implements INodeType {
 						value: 'cmdb.object',
 					},
 					{
+						name: 'CMDB Objects (List)',
+						value: 'cmdb.objects',
+					},					
+					{
 						name: 'CMDB Category',
 						value: 'cmdb.category',
 					},					
@@ -111,26 +115,30 @@ export class idoit implements INodeType {
 					show: {
 						namespace:[
 							'cmdb.category',
+							'cmdb.objects',
 						],
 					},
 				},
 				default: '',
 				description: 'Category',							
 			},
-//			{
-//				displayName: 'Category',
-//				name: 'category',
-//				type: 'string',
-//				displayOptions: {
-//					show: {
-//						namespace:[
-//							'cmdb.category',
-//						],
-//					},
-//				},
-//				default: '',
-//				description: 'Category',				
-//			},			
+			{
+				displayName: 'Object Type',
+				name: 'type',
+				type: 'options',
+				typeOptions: {
+					loadOptionsMethod: 'getObjectTypes',
+				},
+				displayOptions: {
+					show: {
+						namespace:[
+							'cmdb.objects',
+						],
+					},
+				},
+				default: '',
+				description: 'Object Type ex. Server or Switch',							
+			},			
 			{
 				displayName: 'Id',
 				name: 'id',
@@ -148,6 +156,7 @@ export class idoit implements INodeType {
 					},
 				},
 				default: '',
+				required: true,
 				description: 'Id of Resource',
 			},
 			{
@@ -158,11 +167,13 @@ export class idoit implements INodeType {
 					show: {
 						namespace:[
 							'idoit.search',
+							'cmdb.objects',
 						],						
 					},
 				},
 				default: '',
-				description: 'Id of Resource',
+				required: true,
+				description: 'ex. Search over all or Object title',
 			},			
 			{
 				displayName: 'Retrieve and Split Data Items',
@@ -200,8 +211,33 @@ export class idoit implements INodeType {
 
 	methods = {
 		loadOptions: {
-			// Get all the available streams to display them to user so that he can
-			// select them easily
+			async getObjectTypes(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
+				const returnData: INodePropertyOptions[] = [];
+				const credentials = await this.getCredentials('idoit') as IDataObject;
+				const rbody =
+					{
+						'jsonrpc': '2.0',
+						'method': 'idoit.constants',
+						'params': {
+							'apikey': `${credentials.apikey}`
+						},
+						'id': 1
+					}
+				const data = await idoitRequest.call(this, rbody);
+				const objecttypes = data.result.objectTypes;
+				
+				for (const [key, value] of Object.entries(objecttypes)) {
+					const keyName = key;
+					const keyValue = value;
+					returnData.push({
+						//@ts-ignore
+						name: keyValue,
+						value: keyName,
+					});
+				}
+				return returnData;
+			},
+			
 			async getCategories(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 				const returnData: INodePropertyOptions[] = [];
 				const credentials = await this.getCredentials('idoit') as IDataObject;
@@ -303,6 +339,39 @@ export class idoit implements INodeType {
 				// 						Read
 				//--------------------------------------------------------
 				if(operation == 'read'){
+					
+					if (namespace === 'cmdb.objects') {
+						const type = this.getNodeParameter('type', itemIndex, '') as string;
+						const category = this.getNodeParameter('category', itemIndex, '') as string;
+						const searchstring = this.getNodeParameter('searchstring', itemIndex, '') as string;
+						item = items[itemIndex];
+					
+						const rbody =
+						{
+							'jsonrpc': '2.0',
+							'method': `${namespace}.read`,
+							'params': {
+								'filter': {
+									'type': `${type}`,
+									'title': `${searchstring}`
+								},
+								'categories': `${category}`,
+								'order_by': 'title',
+								'sort': 'ASC',
+								'apikey': `${credentials.apikey}`
+							},
+							'id': 1
+						}
+						
+						const newItem: INodeExecutionData = {
+							json: {},
+							binary: {},
+						};
+						newItem.json = await idoitRequest.call(this, rbody);
+						returnItems.push(newItem);						
+
+					}					
+					
 					if (namespace === 'cmdb.object') {
 						const id = this.getNodeParameter('id', itemIndex, '') as string;
 						item = items[itemIndex];
