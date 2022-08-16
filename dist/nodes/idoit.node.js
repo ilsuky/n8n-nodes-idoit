@@ -81,7 +81,7 @@ class idoit {
                         {
                             name: 'Delete',
                             value: 'delete',
-                            description: 'Delete a record',
+                            description: 'Mark a record as deleted',
                         },
                         {
                             name: 'Recycle',
@@ -92,6 +92,11 @@ class idoit {
                             name: 'Archive',
                             value: 'archive',
                             description: 'Archive a record',
+                        },
+                        {
+                            name: 'Purge',
+                            value: 'purge',
+                            description: 'Delete a record from Database',
                         },
                     ],
                     default: 'read',
@@ -149,6 +154,10 @@ class idoit {
                             operation: [
                                 'read',
                                 'update',
+                                'delete',
+                                'archive',
+                                'recycle',
+                                'purge',
                             ],
                             namespace: [
                                 'cmdb.object',
@@ -159,6 +168,27 @@ class idoit {
                     default: '',
                     required: true,
                     description: 'Id of Resource',
+                },
+                {
+                    displayName: 'Category entry Id',
+                    name: 'cateid',
+                    type: 'string',
+                    displayOptions: {
+                        show: {
+                            operation: [
+                                'delete',
+                                'archive',
+                                'recycle',
+                                'purge',
+                            ],
+                            namespace: [
+                                'cmdb.category',
+                            ],
+                        },
+                    },
+                    default: '',
+                    required: true,
+                    description: 'Entry identifier, for example: 3',
                 },
                 {
                     displayName: 'Search String',
@@ -207,6 +237,52 @@ class idoit {
                     },
                     default: true,
                     description: 'Retrieve and Split Data array into seperate Items',
+                },
+                {
+                    displayName: 'Values to Set',
+                    name: 'values',
+                    placeholder: 'Add Value',
+                    type: 'fixedCollection',
+                    typeOptions: {
+                        multipleValues: true,
+                        sortable: true,
+                    },
+                    description: 'The value to set.',
+                    default: {},
+                    options: [
+                        {
+                            name: 'attributes',
+                            displayName: 'Attributes',
+                            values: [
+                                {
+                                    displayName: 'Name',
+                                    name: 'name',
+                                    type: 'string',
+                                    default: '',
+                                    description: 'Name of value to set',
+                                },
+                                {
+                                    displayName: 'Value',
+                                    name: 'value',
+                                    type: 'string',
+                                    default: '',
+                                    description: 'Value to set.',
+                                },
+                            ],
+                        },
+                    ],
+                    displayOptions: {
+                        show: {
+                            operation: [
+                                'create',
+                                'update',
+                            ],
+                            namespace: [
+                                'cmdb.category',
+                                'cmdb.objects',
+                            ],
+                        },
+                    },
                 },
             ],
         };
@@ -304,7 +380,93 @@ class idoit {
         const credentials = await this.getCredentials('idoit');
         for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
             try {
+                if (operation == 'recycle' || operation == 'archive' || operation == 'purge') {
+                    if (namespace === 'cmdb.object') {
+                        const id = this.getNodeParameter('id', itemIndex, '');
+                        item = items[itemIndex];
+                        const rbody = {
+                            'jsonrpc': '2.0',
+                            'method': `${namespace}.${operation}`,
+                            'params': {
+                                'object': id,
+                                'apikey': `${credentials.apikey}`
+                            },
+                            'id': 1
+                        };
+                        const newItem = {
+                            json: {},
+                            binary: {},
+                        };
+                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        returnItems.push(newItem);
+                    }
+                    if (namespace === 'cmdb.category') {
+                        const id = this.getNodeParameter('id', itemIndex, '');
+                        const category = this.getNodeParameter('category', itemIndex, '');
+                        const cateid = this.getNodeParameter('cateid', itemIndex, '');
+                        const rbody = {
+                            'jsonrpc': '2.0',
+                            'method': `${namespace}.${operation}`,
+                            'params': {
+                                'object': id,
+                                'category': `${category}`,
+                                'entry': `${cateid}`,
+                                'apikey': `${credentials.apikey}`
+                            },
+                            'id': 1
+                        };
+                        const newItem = {
+                            json: {},
+                            binary: {},
+                        };
+                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        returnItems.push(newItem);
+                    }
+                }
                 if (operation == 'delete') {
+                    if (namespace === 'cmdb.object') {
+                        const id = this.getNodeParameter('id', itemIndex, '');
+                        item = items[itemIndex];
+                        const rbody = {
+                            'jsonrpc': '2.0',
+                            'method': `${namespace}.${operation}`,
+                            'params': {
+                                'id': id,
+                                'status': 'C__RECORD_STATUS__DELETED',
+                                'apikey': `${credentials.apikey}`
+                            },
+                            'id': 1
+                        };
+                        const newItem = {
+                            json: {},
+                            binary: {},
+                        };
+                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        returnItems.push(newItem);
+                    }
+                    if (namespace === 'cmdb.category') {
+                        const id = this.getNodeParameter('id', itemIndex, '');
+                        const category = this.getNodeParameter('category', itemIndex, '');
+                        const cateid = this.getNodeParameter('cateid', itemIndex, '');
+                        item = items[itemIndex];
+                        const rbody = {
+                            'jsonrpc': '2.0',
+                            'method': `${namespace}.${operation}`,
+                            'params': {
+                                'objID': id,
+                                'category': `${category}`,
+                                'cateID': `${cateid}`,
+                                'apikey': `${credentials.apikey}`
+                            },
+                            'id': 1
+                        };
+                        const newItem = {
+                            json: {},
+                            binary: {},
+                        };
+                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        returnItems.push(newItem);
+                    }
                 }
                 if (operation == 'update') {
                 }

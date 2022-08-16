@@ -80,7 +80,7 @@ export class idoit implements INodeType {
 					{
 						name: 'Delete',
 						value: 'delete',
-						description: 'Delete a record',
+						description: 'Mark a record as deleted',
 					},		
 					{
 						name: 'Recycle',
@@ -91,7 +91,12 @@ export class idoit implements INodeType {
 						name: 'Archive',
 						value: 'archive',
 						description: 'Archive a record',
-					},						
+					},		
+					{
+						name: 'Purge',
+						value: 'purge',
+						description: 'Delete a record from Database',
+					},					
 				],
 				default: 'read',
 				description: 'Operation to perform',
@@ -148,6 +153,10 @@ export class idoit implements INodeType {
 						operation:[
 							'read',
 							'update',
+							'delete',
+							'archive',
+							'recycle',
+							'purge',
 						],
 						namespace:[
 							'cmdb.object',
@@ -159,6 +168,27 @@ export class idoit implements INodeType {
 				required: true,
 				description: 'Id of Resource',
 			},
+			{
+				displayName: 'Category entry Id',
+				name: 'cateid',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation:[
+							'delete',
+							'archive',
+							'recycle',
+							'purge',							
+						],
+						namespace:[
+							'cmdb.category',
+						],						
+					},
+				},
+				default: '',
+				required: true,
+				description: 'Entry identifier, for example: 3',
+			},			
 			{
 				displayName: 'Search String',
 				name: 'searchstring',
@@ -206,7 +236,53 @@ export class idoit implements INodeType {
 				},
 				default: true,
 				description: 'Retrieve and Split Data array into seperate Items',
-			},				
+			},		
+			{
+				displayName: 'Values to Set',
+				name: 'values',
+				placeholder: 'Add Value',
+				type: 'fixedCollection',
+				typeOptions: {
+					multipleValues: true,
+					sortable: true,
+				},
+				description: 'The value to set.',
+				default: {},
+				options: [
+					{
+						name: 'attributes',
+						displayName: 'Attributes',
+						values: [
+							{
+								displayName: 'Name',
+								name: 'name',
+								type: 'string',
+								default: '',
+								description: 'Name of value to set',
+							},
+							{
+								displayName: 'Value',
+								name: 'value',
+								type: 'string',
+								default: '',
+								description: 'Value to set.',
+							},
+						],
+					},
+				],
+				displayOptions: {
+					show: {
+						operation:[
+							'create',
+							'update',
+						],
+						namespace:[
+							'cmdb.category',
+							'cmdb.objects',
+						],						
+					},
+				},
+			},			
 		],
 	};
 
@@ -330,11 +406,115 @@ export class idoit implements INodeType {
 			try {
 
 				//--------------------------------------------------------
-				// 						Delete
+				// 				Recycle / Archive / Purge
 				//--------------------------------------------------------
-				if(operation == 'delete'){
+				if(operation == 'recycle' || operation == 'archive' || operation == 'purge'){
+					if (namespace === 'cmdb.object') {
+						const id = this.getNodeParameter('id', itemIndex, '') as string;
+						item = items[itemIndex];
+					
+						const rbody =
+						{
+							'jsonrpc': '2.0',
+							'method': `${namespace}.${operation}`,
+							'params': {
+								'object': id,
+								'apikey': `${credentials.apikey}`
+							},
+							'id': 1
+						}
+						
+						const newItem: INodeExecutionData = {
+							json: {},
+							binary: {},
+						};
+						newItem.json = await idoitRequest.call(this, rbody);
+						returnItems.push(newItem);												
+					}
+					if (namespace === 'cmdb.category') {
+						const id = this.getNodeParameter('id', itemIndex, '') as string;
+						const category = this.getNodeParameter('category', itemIndex, '') as string;
+						const cateid = this.getNodeParameter('cateid', itemIndex, '') as string;	
 
-				}		
+						const rbody =
+						{
+							'jsonrpc': '2.0',
+							'method': `${namespace}.${operation}`,
+							'params': {
+								'object': id,
+								'category': `${category}`,
+								'entry': `${cateid}`,
+								'apikey': `${credentials.apikey}`
+							},
+							'id': 1
+						}
+
+
+						const newItem: INodeExecutionData = {
+							json: {},
+							binary: {},
+						};
+						newItem.json = await idoitRequest.call(this, rbody);
+						returnItems.push(newItem);							
+					}
+				}
+				
+				//--------------------------------------------------------
+				// 				Delete
+				//--------------------------------------------------------				
+				if(operation == 'delete'){
+					if (namespace === 'cmdb.object') {
+						const id = this.getNodeParameter('id', itemIndex, '') as string;
+						item = items[itemIndex];
+					
+						const rbody =
+						{
+							'jsonrpc': '2.0',
+							'method': `${namespace}.${operation}`,
+							'params': {
+								'id': id,
+								'status': 'C__RECORD_STATUS__DELETED',
+								'apikey': `${credentials.apikey}`
+							},
+							'id': 1
+						}
+						
+						const newItem: INodeExecutionData = {
+							json: {},
+							binary: {},
+						};
+						newItem.json = await idoitRequest.call(this, rbody);
+						returnItems.push(newItem);												
+					}
+					
+					if (namespace === 'cmdb.category') {
+						const id = this.getNodeParameter('id', itemIndex, '') as string;
+						const category = this.getNodeParameter('category', itemIndex, '') as string;
+						const cateid = this.getNodeParameter('cateid', itemIndex, '') as string;
+						
+						item = items[itemIndex];
+						
+						const rbody =
+						{
+							'jsonrpc': '2.0',
+							'method': `${namespace}.${operation}`,
+							'params': {
+								'objID': id,
+								'category': `${category}`,
+								'cateID': `${cateid}`,
+								'apikey': `${credentials.apikey}`
+							},
+							'id': 1
+						}
+						
+						const newItem: INodeExecutionData = {
+							json: {},
+							binary: {},
+						};
+						newItem.json = await idoitRequest.call(this, rbody);
+						returnItems.push(newItem);						
+					}
+				}				
 			
 				//--------------------------------------------------------
 				// 						Update
