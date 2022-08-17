@@ -345,7 +345,7 @@ export class idoit implements INodeType {
 					const keyValue = value;
 					returnData.push({
 						//@ts-ignore
-						name: keyValue,
+						name: keyValue + ' ('+keyName+')',
 						value: keyName,
 					});
 				}
@@ -384,7 +384,7 @@ export class idoit implements INodeType {
 					const keyValue = value;
 					returnData.push({
 						//@ts-ignore
-						name: keyValue,
+						name: keyValue + ' ('+keyName+')',
 						value: keyName,
 					});
 				}
@@ -401,7 +401,7 @@ export class idoit implements INodeType {
 					const keyValue = value;
 					returnData.push({
 						//@ts-ignore
-						name: keyValue,
+						name: keyValue + ' ('+keyName+')',
 						value: keyName,
 					});
 				}				
@@ -418,7 +418,7 @@ export class idoit implements INodeType {
 					const keyValue = value;
 					returnData.push({
 						//@ts-ignore
-						name: keyValue,
+						name: keyValue + ' ('+keyName+')',
 						value: keyName,
 					});
 				}						
@@ -691,9 +691,7 @@ export class idoit implements INodeType {
 							},
 							'id': 1
 						}
-						
-						console.log(data);
-										
+															
 						const newItem: INodeExecutionData = {
 							json: {},
 							binary: {},

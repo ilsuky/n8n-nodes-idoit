@@ -342,7 +342,7 @@ class idoit {
                         const keyName = key;
                         const keyValue = value;
                         returnData.push({
-                            name: keyValue,
+                            name: keyValue + ' (' + keyName + ')',
                             value: keyName,
                         });
                     }
@@ -373,7 +373,7 @@ class idoit {
                         const keyName = key;
                         const keyValue = value;
                         returnData.push({
-                            name: keyValue,
+                            name: keyValue + ' (' + keyName + ')',
                             value: keyName,
                         });
                     }
@@ -386,7 +386,7 @@ class idoit {
                         const keyName = key;
                         const keyValue = value;
                         returnData.push({
-                            name: keyValue,
+                            name: keyValue + ' (' + keyName + ')',
                             value: keyName,
                         });
                     }
@@ -399,7 +399,7 @@ class idoit {
                         const keyName = key;
                         const keyValue = value;
                         returnData.push({
-                            name: keyValue,
+                            name: keyValue + ' (' + keyName + ')',
                             value: keyName,
                         });
                     }
@@ -609,7 +609,6 @@ class idoit {
                             },
                             'id': 1
                         };
-                        console.log(data);
                         const newItem = {
                             json: {},
                             binary: {},
