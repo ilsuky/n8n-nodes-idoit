@@ -593,9 +593,9 @@ class idoit {
                         const category = this.getNodeParameter('category', itemIndex, '');
                         item = items[itemIndex];
                         const attributesInput = this.getNodeParameter('values.attributes', itemIndex, []);
-                        const attributes = {};
+                        const data = {};
                         for (let attributesIndex = 0; attributesIndex < attributesInput.length; attributesIndex++) {
-                            attributes[`${attributesInput[attributesIndex].name}`] = attributesInput[attributesIndex].value;
+                            data[`${attributesInput[attributesIndex].name}`] = attributesInput[attributesIndex].value;
                         }
                         ;
                         const rbody = {
@@ -604,13 +604,12 @@ class idoit {
                             'params': {
                                 'objID': `${id}`,
                                 'category': `${category}`,
-                                'data': `${attributes}`,
+                                data,
                                 'apikey': `${credentials.apikey}`
                             },
                             'id': 1
                         };
-                        console.log(rbody);
-                        const data = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        console.log(data);
                         const newItem = {
                             json: {},
                             binary: {},

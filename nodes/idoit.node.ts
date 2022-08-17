@@ -674,9 +674,9 @@ export class idoit implements INodeType {
 						
 						const attributesInput = this.getNodeParameter('values.attributes', itemIndex, []) as INodeParameters[];
 						
-						const attributes:IDataObject ={};
+						const data:IDataObject ={};
 						for (let attributesIndex = 0; attributesIndex < attributesInput.length; attributesIndex++) {
-							attributes[`${attributesInput[attributesIndex].name}`] = attributesInput[attributesIndex].value;
+							data[`${attributesInput[attributesIndex].name}`] = attributesInput[attributesIndex].value;
 						};
 						
 						const rbody =
@@ -686,16 +686,14 @@ export class idoit implements INodeType {
 							'params': {
 								'objID': `${id}`,
 								'category': `${category}`,
-								'data': `${attributes}`,
+								data,
 								'apikey': `${credentials.apikey}`
 							},
 							'id': 1
 						}
 						
-						console.log(rbody);
-						
-						const data = await idoitRequest.call(this, rbody);
-						
+						console.log(data);
+										
 						const newItem: INodeExecutionData = {
 							json: {},
 							binary: {},
