@@ -609,6 +609,7 @@ class idoit {
                             },
                             'id': 1
                         };
+                        console.log(rbody);
                         const data = await GenericFunctions_1.idoitRequest.call(this, rbody);
                         const newItem = {
                             json: {},

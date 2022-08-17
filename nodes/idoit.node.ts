@@ -692,6 +692,8 @@ export class idoit implements INodeType {
 							'id': 1
 						}
 						
+						console.log(rbody);
+						
 						const data = await idoitRequest.call(this, rbody);
 						
 						const newItem: INodeExecutionData = {
