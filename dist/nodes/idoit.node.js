@@ -208,6 +208,25 @@ class idoit {
                     description: 'ex. Search over all or Object title',
                 },
                 {
+                    displayName: 'Title',
+                    name: 'title',
+                    type: 'string',
+                    displayOptions: {
+                        show: {
+                            operation: [
+                                'create',
+                                'update',
+                            ],
+                            namespace: [
+                                'cmdb.object',
+                            ],
+                        },
+                    },
+                    default: '',
+                    required: true,
+                    description: 'Object title',
+                },
+                {
                     displayName: 'Values to Set',
                     name: 'values',
                     placeholder: 'Add Value',
@@ -248,7 +267,6 @@ class idoit {
                             ],
                             namespace: [
                                 'cmdb.category',
-                                'cmdb.object',
                             ],
                         },
                     },
@@ -529,21 +547,18 @@ class idoit {
                 }
                 if (operation == 'create') {
                     if (namespace === 'cmdb.object') {
-                        const attributesInput = this.getNodeParameter('values.attributes', itemIndex, []);
-                        const category = this.getNodeParameter('category', itemIndex, '');
                         const type = this.getNodeParameter('type', itemIndex, '');
-                        const attributes = {};
-                        for (let attributesIndex = 0; attributesIndex < attributesInput.length; attributesIndex++) {
-                            attributes[`${attributesInput[attributesIndex].name}`] = attributesInput[attributesIndex].value;
-                        }
-                        ;
+                        const title = this.getNodeParameter('title', itemIndex, '');
                         item = items[itemIndex];
                         const rbody = {
                             'jsonrpc': '2.0',
                             'method': `${namespace}.create`,
                             'params': {
-                                'type': 'C__OBJTYPE__SERVER',
-                                'title': 'My little server',
+                                'type': `${type}`,
+                                'title': `${title}`,
+                                'purpose': 'In production',
+                                'cmdb_status': 'C__CMDB_STATUS__IN_OPERATION',
+                                'description': 'created by n8n',
                                 'apikey': `${credentials.apikey}`
                             },
                             'id': 1

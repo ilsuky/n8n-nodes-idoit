@@ -207,6 +207,25 @@ export class idoit implements INodeType {
 				description: 'ex. Search over all or Object title',
 			},	
 			{
+				displayName: 'Title',
+				name: 'title',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation:[
+							'create',
+							'update',
+						],
+						namespace:[
+							'cmdb.object',
+						],						
+					},
+				},
+				default: '',
+				required: true,
+				description: 'Object title',
+			},				
+			{
 				displayName: 'Values to Set',
 				name: 'values',
 				placeholder: 'Add Value',
@@ -247,7 +266,6 @@ export class idoit implements INodeType {
 						],
 						namespace:[
 							'cmdb.category',
-							'cmdb.object',
 						],						
 					},
 				},
@@ -601,15 +619,9 @@ export class idoit implements INodeType {
 				//--------------------------------------------------------
 				if(operation == 'create'){
 					if (namespace === 'cmdb.object') {
-						const attributesInput = this.getNodeParameter('values.attributes', itemIndex, []) as INodeParameters[];
-						const category = this.getNodeParameter('category', itemIndex, '') as string;
 						const type = this.getNodeParameter('type', itemIndex, '') as string;
-						
-						const attributes:IDataObject ={};
-						for (let attributesIndex = 0; attributesIndex < attributesInput.length; attributesIndex++) {
-							attributes[`${attributesInput[attributesIndex].name}`] = attributesInput[attributesIndex].value;
-						};
-						
+						const title = this.getNodeParameter('title', itemIndex, '') as string;
+											
 						item = items[itemIndex];
 					
 						const rbody =
@@ -617,8 +629,11 @@ export class idoit implements INodeType {
 							'jsonrpc': '2.0',
 							'method': `${namespace}.create`,
 							'params': {
-								'type': 'C__OBJTYPE__SERVER',
-								'title': 'My little server',
+								'type': `${type}`,
+								'title': `${title}`,
+								'purpose': 'In production',
+								'cmdb_status': 'C__CMDB_STATUS__IN_OPERATION',
+								'description': 'created by n8n',
 								'apikey': `${credentials.apikey}`
 							},
 							'id': 1
