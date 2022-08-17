@@ -139,6 +139,7 @@ class idoit {
                         show: {
                             namespace: [
                                 'cmdb.objects',
+                                'cmdb.object',
                             ],
                         },
                     },
@@ -207,38 +208,6 @@ class idoit {
                     description: 'ex. Search over all or Object title',
                 },
                 {
-                    displayName: 'Retrieve and Split Data Items',
-                    name: 'split',
-                    type: 'boolean',
-                    displayOptions: {
-                        show: {
-                            operation: [
-                                'read',
-                            ],
-                            namespace: [
-                                'cmdb.category',
-                            ],
-                        },
-                    },
-                    default: true,
-                    description: 'Retrieve and Split Data array into seperate Items',
-                },
-                {
-                    displayName: 'Retrieve and Split Data Items',
-                    name: 'split',
-                    type: 'boolean',
-                    displayOptions: {
-                        show: {
-                            namespace: [
-                                'idoit.search',
-                                'cmdb.objects',
-                            ],
-                        },
-                    },
-                    default: true,
-                    description: 'Retrieve and Split Data array into seperate Items',
-                },
-                {
                     displayName: 'Values to Set',
                     name: 'values',
                     placeholder: 'Add Value',
@@ -279,10 +248,42 @@ class idoit {
                             ],
                             namespace: [
                                 'cmdb.category',
+                                'cmdb.object',
+                            ],
+                        },
+                    },
+                },
+                {
+                    displayName: 'Retrieve and Split Data Items',
+                    name: 'split',
+                    type: 'boolean',
+                    displayOptions: {
+                        show: {
+                            operation: [
+                                'read',
+                            ],
+                            namespace: [
+                                'cmdb.category',
+                            ],
+                        },
+                    },
+                    default: true,
+                    description: 'Retrieve and Split Data array into seperate Items',
+                },
+                {
+                    displayName: 'Retrieve and Split Data Items',
+                    name: 'split',
+                    type: 'boolean',
+                    displayOptions: {
+                        show: {
+                            namespace: [
+                                'idoit.search',
                                 'cmdb.objects',
                             ],
                         },
                     },
+                    default: true,
+                    description: 'Retrieve and Split Data array into seperate Items',
                 },
             ],
         };
@@ -528,6 +529,14 @@ class idoit {
                 }
                 if (operation == 'create') {
                     if (namespace === 'cmdb.object') {
+                        const attributesInput = this.getNodeParameter('values.attributes', itemIndex, []);
+                        const category = this.getNodeParameter('category', itemIndex, '');
+                        const type = this.getNodeParameter('type', itemIndex, '');
+                        const attributes = {};
+                        for (let attributesIndex = 0; attributesIndex < attributesInput.length; attributesIndex++) {
+                            attributes[`${attributesInput[attributesIndex].name}`] = attributesInput[attributesIndex].value;
+                        }
+                        ;
                         item = items[itemIndex];
                         const rbody = {
                             'jsonrpc': '2.0',

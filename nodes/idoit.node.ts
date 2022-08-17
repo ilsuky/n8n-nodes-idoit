@@ -138,6 +138,7 @@ export class idoit implements INodeType {
 					show: {
 						namespace:[
 							'cmdb.objects',
+							'cmdb.object',
 						],
 					},
 				},
@@ -204,39 +205,7 @@ export class idoit implements INodeType {
 				default: '',
 				required: true,
 				description: 'ex. Search over all or Object title',
-			},			
-			{
-				displayName: 'Retrieve and Split Data Items',
-				name: 'split',
-				type: 'boolean',
-				displayOptions: {
-					show: {
-						operation:[
-							'read',
-						],
-						namespace:[
-							'cmdb.category',
-						],						
-					},
-				},
-				default: true,
-				description: 'Retrieve and Split Data array into seperate Items',
-			},		
-			{
-				displayName: 'Retrieve and Split Data Items',
-				name: 'split',
-				type: 'boolean',
-				displayOptions: {
-					show: {
-						namespace:[
-							'idoit.search',
-							'cmdb.objects',
-						],						
-					},
-				},
-				default: true,
-				description: 'Retrieve and Split Data array into seperate Items',
-			},		
+			},	
 			{
 				displayName: 'Values to Set',
 				name: 'values',
@@ -278,11 +247,43 @@ export class idoit implements INodeType {
 						],
 						namespace:[
 							'cmdb.category',
+							'cmdb.object',
+						],						
+					},
+				},
+			},				
+			{
+				displayName: 'Retrieve and Split Data Items',
+				name: 'split',
+				type: 'boolean',
+				displayOptions: {
+					show: {
+						operation:[
+							'read',
+						],
+						namespace:[
+							'cmdb.category',
+						],						
+					},
+				},
+				default: true,
+				description: 'Retrieve and Split Data array into seperate Items',
+			},		
+			{
+				displayName: 'Retrieve and Split Data Items',
+				name: 'split',
+				type: 'boolean',
+				displayOptions: {
+					show: {
+						namespace:[
+							'idoit.search',
 							'cmdb.objects',
 						],						
 					},
 				},
-			},			
+				default: true,
+				description: 'Retrieve and Split Data array into seperate Items',
+			},				
 		],
 	};
 
@@ -600,7 +601,15 @@ export class idoit implements INodeType {
 				//--------------------------------------------------------
 				if(operation == 'create'){
 					if (namespace === 'cmdb.object') {
-
+						const attributesInput = this.getNodeParameter('values.attributes', itemIndex, []) as INodeParameters[];
+						const category = this.getNodeParameter('category', itemIndex, '') as string;
+						const type = this.getNodeParameter('type', itemIndex, '') as string;
+						
+						const attributes:IDataObject ={};
+						for (let attributesIndex = 0; attributesIndex < attributesInput.length; attributesIndex++) {
+							attributes[`${attributesInput[attributesIndex].name}`] = attributesInput[attributesIndex].value;
+						};
+						
 						item = items[itemIndex];
 					
 						const rbody =
