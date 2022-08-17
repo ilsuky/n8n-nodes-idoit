@@ -12,7 +12,7 @@ class idoit {
             version: 1,
             description: 'i-doit JSON-RPC API',
             defaults: {
-                name: 'idoit',
+                name: 'i-doit',
                 color: '#772244',
             },
             subtitle: '={{$parameter["namespace"]}}',
@@ -703,8 +703,8 @@ class idoit {
                             'jsonrpc': '2.0',
                             'method': `${namespace}.create`,
                             'params': {
-                                'type': `${type}`,
-                                'title': `${title}`,
+                                'type': type,
+                                'title': title,
                                 'purpose': 'production',
                                 'cmdb_status': 'C__CMDB_STATUS__IN_OPERATION',
                                 'description': 'created by n8n',
@@ -733,8 +733,8 @@ class idoit {
                             'jsonrpc': '2.0',
                             'method': `${namespace}.save`,
                             'params': {
-                                'objID': `${id}`,
-                                'category': `${category}`,
+                                'object': id,
+                                'category': category,
                                 data,
                                 'apikey': `${credentials.apikey}`
                             },
