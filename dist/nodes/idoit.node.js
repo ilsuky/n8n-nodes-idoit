@@ -171,6 +171,24 @@ class idoit {
                     description: 'Id of Resource',
                 },
                 {
+                    displayName: 'Id',
+                    name: 'id',
+                    type: 'string',
+                    displayOptions: {
+                        show: {
+                            operation: [
+                                'create',
+                            ],
+                            namespace: [
+                                'cmdb.category',
+                            ],
+                        },
+                    },
+                    default: '',
+                    required: true,
+                    description: 'Id of Object',
+                },
+                {
                     displayName: 'Category entry Id',
                     name: 'cateid',
                     type: 'string',
@@ -556,7 +574,7 @@ class idoit {
                             'params': {
                                 'type': `${type}`,
                                 'title': `${title}`,
-                                'purpose': 'In production',
+                                'purpose': 'production',
                                 'cmdb_status': 'C__CMDB_STATUS__IN_OPERATION',
                                 'description': 'created by n8n',
                                 'apikey': `${credentials.apikey}`
@@ -573,37 +591,31 @@ class idoit {
                     if (namespace === 'cmdb.category') {
                         const id = this.getNodeParameter('id', itemIndex, '');
                         const category = this.getNodeParameter('category', itemIndex, '');
-                        const split = this.getNodeParameter('split', itemIndex, '');
+                        item = items[itemIndex];
+                        const attributesInput = this.getNodeParameter('values.attributes', itemIndex, []);
+                        const attributes = {};
+                        for (let attributesIndex = 0; attributesIndex < attributesInput.length; attributesIndex++) {
+                            attributes[`${attributesInput[attributesIndex].name}`] = attributesInput[attributesIndex].value;
+                        }
+                        ;
                         const rbody = {
                             'jsonrpc': '2.0',
                             'method': `${namespace}.create`,
                             'params': {
-                                'objID': id,
+                                'objID': `${id}`,
                                 'category': `${category}`,
+                                'data': `${attributes}`,
                                 'apikey': `${credentials.apikey}`
                             },
                             'id': 1
                         };
                         const data = await GenericFunctions_1.idoitRequest.call(this, rbody);
-                        if (split) {
-                            const datajson = data.result;
-                            for (let dataIndex = 0; dataIndex < datajson.length; dataIndex++) {
-                                const newItem = {
-                                    json: {},
-                                    binary: {},
-                                };
-                                newItem.json = datajson[dataIndex];
-                                returnItems.push(newItem);
-                            }
-                        }
-                        else {
-                            const newItem = {
-                                json: {},
-                                binary: {},
-                            };
-                            newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
-                            returnItems.push(newItem);
-                        }
+                        const newItem = {
+                            json: {},
+                            binary: {},
+                        };
+                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        returnItems.push(newItem);
                     }
                 }
                 if (namespace == 'idoit.version' || namespace == 'idoit.constants') {

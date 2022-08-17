@@ -170,6 +170,24 @@ export class idoit implements INodeType {
 				description: 'Id of Resource',
 			},
 			{
+				displayName: 'Id',
+				name: 'id',
+				type: 'string',
+				displayOptions: {
+					show: {
+						operation:[
+							'create',
+						],
+						namespace:[
+							'cmdb.category',
+						],						
+					},
+				},
+				default: '',
+				required: true,
+				description: 'Id of Object',
+			},			
+			{
 				displayName: 'Category entry Id',
 				name: 'cateid',
 				type: 'string',
@@ -631,7 +649,7 @@ export class idoit implements INodeType {
 							'params': {
 								'type': `${type}`,
 								'title': `${title}`,
-								'purpose': 'In production',
+								'purpose': 'production',
 								'cmdb_status': 'C__CMDB_STATUS__IN_OPERATION',
 								'description': 'created by n8n',
 								'apikey': `${credentials.apikey}`
@@ -651,15 +669,24 @@ export class idoit implements INodeType {
 					if (namespace === 'cmdb.category') {
 						const id = this.getNodeParameter('id', itemIndex, '') as string;
 						const category = this.getNodeParameter('category', itemIndex, '') as string;
-						const split = this.getNodeParameter('split', itemIndex, '') as boolean;
+						
+						item = items[itemIndex];
+						
+						const attributesInput = this.getNodeParameter('values.attributes', itemIndex, []) as INodeParameters[];
+						
+						const attributes:IDataObject ={};
+						for (let attributesIndex = 0; attributesIndex < attributesInput.length; attributesIndex++) {
+							attributes[`${attributesInput[attributesIndex].name}`] = attributesInput[attributesIndex].value;
+						};
 						
 						const rbody =
 						{
 							'jsonrpc': '2.0',
 							'method': `${namespace}.create`,
 							'params': {
-								'objID': id,
+								'objID': `${id}`,
 								'category': `${category}`,
+								'data': `${attributes}`,
 								'apikey': `${credentials.apikey}`
 							},
 							'id': 1
@@ -667,26 +694,12 @@ export class idoit implements INodeType {
 						
 						const data = await idoitRequest.call(this, rbody);
 						
-						if(split){
-							const datajson = data.result;
-							for (let dataIndex = 0; dataIndex < datajson.length; dataIndex++) {
-								const newItem: INodeExecutionData = {
-									json: {},
-									binary: {},
-								};
-								newItem.json = datajson[dataIndex];
-		
-								returnItems.push(newItem);
-							}
-						} else {
-							const newItem: INodeExecutionData = {
-								json: {},
-								binary: {},
-							};
-							newItem.json = await idoitRequest.call(this, rbody);
-		
-							returnItems.push(newItem);
-						}						
+						const newItem: INodeExecutionData = {
+							json: {},
+							binary: {},
+						};
+						newItem.json = await idoitRequest.call(this, rbody);
+						returnItems.push(newItem);						
 		
 					}
 				}
