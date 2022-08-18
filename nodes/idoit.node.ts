@@ -48,7 +48,11 @@ export class idoit implements INodeType {
 					{
 						name: 'CMDB Objects (List)',
 						value: 'cmdb.objects',
-					},					
+					},
+					{
+						name: 'CMDB Objects Type Category',
+						value: 'cmdb.object_type_categories',
+					},							
 					{
 						name: 'CMDB Category',
 						value: 'cmdb.category',
@@ -148,7 +152,28 @@ export class idoit implements INodeType {
 						],
 					},
 				},				
-			},			
+			},	
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				options: [
+					{
+						name: 'Read',
+						value: 'read',
+						description: 'Retrieve a record',
+					},					
+				],
+				default: 'read',
+				description: 'Operation to perform',
+				displayOptions: {
+					show: {
+						namespace:[
+							'cmdb.object_type_categories',
+						],
+					},
+				},				
+			},				
 			{
 				displayName: 'Category',
 				name: 'category',
@@ -203,6 +228,7 @@ export class idoit implements INodeType {
 						namespace:[
 							'cmdb.object',
 							'cmdb.category',
+							'cmdb.object_type_categories',
 						],						
 					},
 				},
@@ -686,6 +712,46 @@ export class idoit implements INodeType {
 				// 						Read
 				//--------------------------------------------------------
 				if(operation == 'read'){
+									
+									
+					if (namespace === 'cmdb.object_type_categories') {
+						const id = this.getNodeParameter('id', itemIndex, '') as string;
+						item = items[itemIndex];
+					
+						const rbody =
+						{
+							'jsonrpc': '2.0',
+							'method': 'cmdb.object.read',
+							'params': {
+								'id': id,
+								'apikey': `${credentials.apikey}`
+							},
+							'id': 1
+						}
+						
+						const newObject = await idoitRequest.call(this, rbody);
+						const datajson = newObject.result;
+						
+						const rcbody =
+						{
+							'jsonrpc': '2.0',
+							'method': `${namespace}.read`,
+							'params': {
+								'type': datajson.objecttype,
+								'apikey': `${credentials.apikey}`
+							},
+							'id': 1
+						}						
+						
+						const newItem: INodeExecutionData = {
+							json: {},
+							binary: {},
+						};
+						newItem.json = await idoitRequest.call(this, rcbody);
+						
+						returnItems.push(newItem);
+						
+					}
 									
 					if (namespace === 'cmdb.dialog') {				
 						const category = this.getNodeParameter('category', itemIndex, '') as string;

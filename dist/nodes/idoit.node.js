@@ -51,6 +51,10 @@ class idoit {
                             value: 'cmdb.objects',
                         },
                         {
+                            name: 'CMDB Objects Type Category',
+                            value: 'cmdb.object_type_categories',
+                        },
+                        {
                             name: 'CMDB Category',
                             value: 'cmdb.category',
                         },
@@ -151,6 +155,27 @@ class idoit {
                     },
                 },
                 {
+                    displayName: 'Operation',
+                    name: 'operation',
+                    type: 'options',
+                    options: [
+                        {
+                            name: 'Read',
+                            value: 'read',
+                            description: 'Retrieve a record',
+                        },
+                    ],
+                    default: 'read',
+                    description: 'Operation to perform',
+                    displayOptions: {
+                        show: {
+                            namespace: [
+                                'cmdb.object_type_categories',
+                            ],
+                        },
+                    },
+                },
+                {
                     displayName: 'Category',
                     name: 'category',
                     type: 'options',
@@ -204,6 +229,7 @@ class idoit {
                             namespace: [
                                 'cmdb.object',
                                 'cmdb.category',
+                                'cmdb.object_type_categories',
                             ],
                         },
                     },
@@ -618,6 +644,36 @@ class idoit {
                     }
                 }
                 if (operation == 'read') {
+                    if (namespace === 'cmdb.object_type_categories') {
+                        const id = this.getNodeParameter('id', itemIndex, '');
+                        item = items[itemIndex];
+                        const rbody = {
+                            'jsonrpc': '2.0',
+                            'method': 'cmdb.object.read',
+                            'params': {
+                                'id': id,
+                                'apikey': `${credentials.apikey}`
+                            },
+                            'id': 1
+                        };
+                        const newObject = await GenericFunctions_1.idoitRequest.call(this, rbody);
+                        const datajson = newObject.result;
+                        const rcbody = {
+                            'jsonrpc': '2.0',
+                            'method': `${namespace}.read`,
+                            'params': {
+                                'type': datajson.objecttype,
+                                'apikey': `${credentials.apikey}`
+                            },
+                            'id': 1
+                        };
+                        const newItem = {
+                            json: {},
+                            binary: {},
+                        };
+                        newItem.json = await GenericFunctions_1.idoitRequest.call(this, rcbody);
+                        returnItems.push(newItem);
+                    }
                     if (namespace === 'cmdb.dialog') {
                         const category = this.getNodeParameter('category', itemIndex, '');
                         const property = this.getNodeParameter('property', itemIndex, '');
