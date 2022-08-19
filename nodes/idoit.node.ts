@@ -264,7 +264,7 @@ export class idoit implements INodeType {
 							'delete',
 							'archive',
 							'recycle',
-							'purge',							
+							'purge',
 						],
 						namespace:[
 							'cmdb.category',
@@ -741,7 +741,17 @@ export class idoit implements INodeType {
 								'apikey': `${credentials.apikey}`
 							},
 							'id': 1
-						}						
+						}
+
+						const newObjectCat = await idoitRequest.call(this, rcbody);
+						const datajsonCat = newObjectCat.result;
+
+						const categoryTypes = ['catg', 'cats', 'custom'];						
+						
+						categoryTypes.forEach(function (value) {
+							
+						
+						});
 						
 						const newItem: INodeExecutionData = {
 							json: {},

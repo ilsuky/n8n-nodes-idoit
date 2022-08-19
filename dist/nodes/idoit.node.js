@@ -667,6 +667,11 @@ class idoit {
                             },
                             'id': 1
                         };
+                        const newObjectCat = await GenericFunctions_1.idoitRequest.call(this, rcbody);
+                        const datajsonCat = newObjectCat.result;
+                        const categoryTypes = ['catg', 'cats', 'custom'];
+                        categoryTypes.forEach(function (value) {
+                        });
                         const newItem = {
                             json: {},
                             binary: {},
