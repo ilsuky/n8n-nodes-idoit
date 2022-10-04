@@ -10,7 +10,7 @@
   ],  
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/n8n-io/n8n-nodes-starter.git"
+    "url": "git+https://github.com/ilsuky/n8n-nodes-idoit.git"
   },
   "main": "index.js",
   "scripts": {
@@ -46,12 +46,10 @@
     "nodelinter": "^0.1.9",
     "ts-jest": "^26.3.0",
     "tslint": "^6.1.2",
-    "typescript": "~4.3.5",
-	"url": "^0.11.0"
+    "typescript": "~4.3.5"
   },
   "dependencies": {
-    "n8n-core": "~0.101.0",
-	"url": "^0.11.0"
+    "n8n-core": "~0.101.0"
   },
   "jest": {
     "transform": {
