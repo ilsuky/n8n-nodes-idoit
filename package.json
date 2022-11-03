@@ -1,13 +1,13 @@
 {
   "name": "n8n-nodes-idoit",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "n8n node for i-doit. https://www.i-doit.com/en/",
   "license": "SEE LICENSE IN LICENSE.md",
   "homepage": "https://n8n.io",
   "author": "Christian Vojak <c.vojak@citynet.at>",
   "keywords": [
-    "n8n-community-node-package"
-  ],  
+    "n8n-community-node-package", "n8n", "i-doit", "n8n-node"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ilsuky/n8n-nodes-idoit.git"
@@ -70,8 +70,5 @@
   },
   "bugs": {
     "url": "https://github.com/n8n-io/n8n-nodes-starter/issues"
-  },
-  "keywords": [
-    "n8n"
-  ]
+  }
 }

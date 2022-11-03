@@ -12,7 +12,7 @@ import {
 	NodeOperationError,
 } from 'n8n-workflow';
 
-export async function idoitRequest(
+export async function jokerRequest(
 	this: IExecuteFunctions | ILoadOptionsFunctions,
 	body: IDataObject = {},
 ) {
