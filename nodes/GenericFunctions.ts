@@ -9,10 +9,9 @@ import {
 	IDataObject,
 	ILoadOptionsFunctions,
 	NodeApiError,
-	NodeOperationError,
 } from 'n8n-workflow';
 
-export async function jokerRequest(
+export async function idoitRequest(
 	this: IExecuteFunctions | ILoadOptionsFunctions,
 	body: IDataObject = {},
 ) {

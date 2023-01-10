@@ -1,5 +1,5 @@
 import { IExecuteFunctions } from 'n8n-core';
-import { IDataObject, ILoadOptionsFunctions, INodeExecutionData, INodeParameters, INodeProperties, INodeType, INodeTypeDescription, NodeOperationError, INodePropertyOptions } from 'n8n-workflow';
+import { IDataObject, ILoadOptionsFunctions, INodeExecutionData, INodeParameters, INodeType, INodeTypeDescription, INodePropertyOptions } from 'n8n-workflow';
 import { idoitRequest } from './GenericFunctions';
 
 export class idoit implements INodeType {
@@ -744,7 +744,7 @@ export class idoit implements INodeType {
 						}
 
 						const newObjectCat = await idoitRequest.call(this, rcbody);
-						const datajsonCat = newObjectCat.result;
+						//const datajsonCat = newObjectCat.result;
 
 						const categoryTypes = ['catg', 'cats', 'custom'];						
 						
