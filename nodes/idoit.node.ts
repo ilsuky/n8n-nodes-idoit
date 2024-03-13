@@ -1,5 +1,4 @@
-import { IExecuteFunctions } from 'n8n-core';
-import { IDataObject, ILoadOptionsFunctions, INodeExecutionData, INodeParameters, INodeType, INodeTypeDescription, INodePropertyOptions } from 'n8n-workflow';
+import { IExecuteFunctions, IDataObject, ILoadOptionsFunctions, INodeExecutionData, INodeParameters, INodeType, INodeTypeDescription, INodePropertyOptions } from 'n8n-workflow';
 import { idoitRequest } from './GenericFunctions';
 
 export class idoit implements INodeType {
